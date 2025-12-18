@@ -5,8 +5,9 @@ import (
 	"fmt"
 	"log"
 	"os"
-	
+
 	"github.com/jakeswider/baud/internal/list"
+	"github.com/jakeswider/baud/internal/watch"
 	"github.com/urfave/cli/v3"
 )
 
@@ -43,6 +44,22 @@ func main() {
 					}
 
 					list.RenderTable(portList, cmd.Bool("name"), cmd.Bool("showall"))
+					return nil
+				},
+			},
+			{
+				Name:    "watch",
+				Aliases: []string{"w"},
+				Usage:   "watches for any serial ports being connected or disconnected",
+				Flags: []cli.Flag{
+					&cli.UintFlag{
+						Name:    "time",
+						Aliases: []string{"t"},
+						Usage:   "length of time to watch serial ports for connections/disconnections (in seconds)",
+					},
+				},
+				Action: func(ctx context.Context, cmd *cli.Command) error {
+					watch.WatchSerialPorts(cmd.Uint("time"))
 					return nil
 				},
 			},
