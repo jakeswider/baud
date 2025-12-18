@@ -44,7 +44,7 @@ A lightweight, high-performance CLI tool for discovering serial ports. Built in 
 If you have Go installed, you can compile and install it directly:
 
 ```bash
-go install [github.com/jakeswider/baud/cmd@latest](https://github.com/jakeswider/baud/cmd@latest)
+go install github.com/jakeswider/baud/cmd@latest
 
 ```
 
@@ -89,7 +89,7 @@ To build from source:
 
 1. **Clone the repo:**
 ```bash
-git clone [https://github.com/jakeswider/baud.git](https://github.com/jakeswider/baud.git)
+git clone https://github.com/jakeswider/baud.git
 
 ```
 
