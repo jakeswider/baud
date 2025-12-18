@@ -90,7 +90,7 @@ func PortDetailstoPortInfo(pList []*enumerator.PortDetails) []PortInfo {
 	return PortInfoList
 }
 
-func SerialList() ([]string, error) {
+func GetSerialList() ([]string, error) {
 	ports, err := serial.GetPortsList()
 	if err != nil {
 		return []string{""}, err
@@ -102,7 +102,7 @@ func SerialList() ([]string, error) {
 	return ports, nil
 }
 
-func SerialListDetailed() ([]PortInfo, error) {
+func GetSerialListDetailed() ([]PortInfo, error) {
 	ports, err := enumerator.GetDetailedPortsList()
 	if err != nil {
 		return nil, err

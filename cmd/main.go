@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
-
+	
 	"github.com/jakeswider/baud/internal/list"
 	"github.com/urfave/cli/v3"
 )
@@ -36,7 +36,7 @@ func main() {
 					},
 				},
 				Action: func(ctx context.Context, cmd *cli.Command) error {
-					portList, err := list.SerialListDetailed()
+					portList, err := list.GetSerialListDetailed()
 
 					if err != nil {
 						log.Fatal(err)
