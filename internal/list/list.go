@@ -1,15 +1,15 @@
 package list
 
 import (
-	_ "embed"
 	"bufio"
-	"strings"
+	_ "embed"
 	"fmt"
+	"strings"
 
-	"go.bug.st/serial"
-	"go.bug.st/serial/enumerator"
 	"github.com/charmbracelet/lipgloss"
 	"github.com/charmbracelet/lipgloss/table"
+	"go.bug.st/serial"
+	"go.bug.st/serial/enumerator"
 )
 
 //go:embed usb.ids
@@ -24,7 +24,7 @@ func normID(s string) string {
 
 func init() {
 	scanner := bufio.NewScanner(strings.NewReader(usbDB))
-	
+
 	buf := make([]byte, 64*1024)
 	scanner.Buffer(buf, 1024*1024)
 
@@ -67,7 +67,7 @@ func init() {
 }
 
 type PortInfo struct {
-	Name 	     string
+	Name         string
 	IsUSB        bool
 	VID          string
 	PID          string
@@ -79,12 +79,12 @@ func PortDetailstoPortInfo(pList []*enumerator.PortDetails) []PortInfo {
 	PortInfoList := make([]PortInfo, 0, len(pList))
 	for _, port := range pList {
 		PortInfoList = append(PortInfoList, PortInfo{
-			Name: port.Name,
-			IsUSB: port.IsUSB,
-			VID: port.VID,
-			PID: port.PID,
+			Name:         port.Name,
+			IsUSB:        port.IsUSB,
+			VID:          port.VID,
+			PID:          port.PID,
 			SerialNumber: port.SerialNumber,
-			ProductName: IdentifyDevice(port.VID, port.PID),
+			ProductName:  IdentifyDevice(port.VID, port.PID),
 		})
 	}
 	return PortInfoList
@@ -108,14 +108,14 @@ func SerialListDetailed() ([]PortInfo, error) {
 		return nil, err
 	}
 	if len(ports) == 0 {
-		return nil, nil 
+		return nil, nil
 	}
 	PortInfoList := PortDetailstoPortInfo(ports)
 	return PortInfoList, nil
 }
 
 func IdentifyDevice(vid, pid string) string {
-    v := normID(vid)
+	v := normID(vid)
 	p := normID(pid)
 
 	if v == "" {
@@ -151,29 +151,29 @@ func RenderTable(portList []PortInfo, showNames bool, showAll bool) {
 	if len(usbPorts) == 0 && !showAll {
 		fmt.Println(lipgloss.NewStyle().Foreground(lipgloss.Color("208")).Render("No USB connections found. (consider running with --showall)"))
 		return
-	} 
-    headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("99")).Bold(true).Padding(0, 1)
-    rowStyle := lipgloss.NewStyle().Padding(0, 1).Align(lipgloss.Left)
+	}
+	headerStyle := lipgloss.NewStyle().Foreground(lipgloss.Color("99")).Bold(true).Padding(0, 1)
+	rowStyle := lipgloss.NewStyle().Padding(0, 1).Align(lipgloss.Left)
 
-    headers := []string{"PORT", "USB", "VID", "PID", "SERIAL NUMBER"}
-    if showNames {
-        headers = append(headers, "DEVICE NAME")
-    }
+	headers := []string{"PORT", "USB", "VID", "PID", "SERIAL NUMBER"}
+	if showNames {
+		headers = append(headers, "DEVICE NAME")
+	}
 
-    t := table.New().
-        Border(lipgloss.HiddenBorder()).
-        Headers(headers...).
-        StyleFunc(func(row, col int) lipgloss.Style {
-            if row == table.HeaderRow {
-                return headerStyle
-            }
-            if col == 1 && portList[row].IsUSB && showAll {
-                return rowStyle.Foreground(lipgloss.Color("87"))
-            }
-            return rowStyle
-        })
+	t := table.New().
+		Border(lipgloss.HiddenBorder()).
+		Headers(headers...).
+		StyleFunc(func(row, col int) lipgloss.Style {
+			if row == table.HeaderRow {
+				return headerStyle
+			}
+			if col == 1 && portList[row].IsUSB && showAll {
+				return rowStyle.Foreground(lipgloss.Color("87"))
+			}
+			return rowStyle
+		})
 
-    for _, port := range portList {
+	for _, port := range portList {
 		if !showAll && !port.IsUSB {
 			continue
 		}
@@ -182,14 +182,14 @@ func RenderTable(portList []PortInfo, showNames bool, showAll bool) {
 		if port.IsUSB {
 			isUSB = "Yes"
 		}
-        row := []string{strings.TrimSpace(port.Name), isUSB, port.VID, port.PID, port.SerialNumber}
-        
-        if showNames {
-            row = append(row, port.ProductName)
-        }
-        
-        t.Row(row...)
-    }
+		row := []string{strings.TrimSpace(port.Name), isUSB, port.VID, port.PID, port.SerialNumber}
 
-    fmt.Println(t)
+		if showNames {
+			row = append(row, port.ProductName)
+		}
+
+		t.Row(row...)
+	}
+
+	fmt.Println(t)
 }
