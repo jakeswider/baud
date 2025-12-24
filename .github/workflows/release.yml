@@ -23,8 +23,8 @@ jobs:
 
       - name: Build macOS Binaries
         run: |
-          GOOS=darwin GOARCH=arm64 go build -o baud-mac-arm64 ./cmd
-          GOOS=darwin GOARCH=amd64 go build -o baud-mac-amd64 ./cmd
+          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o baud-mac-arm64 ./cmd
+          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o baud-mac-amd64 ./cmd
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2

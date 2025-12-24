@@ -1,6 +1,6 @@
 # baud
 
-A lightweight, high-performance CLI tool for discovering serial ports. Built in **Pure Go** with zero C-dependencies (CGO-free for Windows/Linux), making it incredibly fast and portable.
+A lightweight, high-performance CLI tool for discovering serial ports. 
 
 ## Features
 - **Fast Discovery:** Instantly list all connected serial devices.
