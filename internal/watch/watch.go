@@ -91,18 +91,14 @@ func WatchSerialPorts(timeToWatch uint) error {
 				headerText = fmt.Sprintf("Baud Watch Mode Active | Ctrl+C to Exit | %s", timerStyle.Render(remaining.String()))
 			}
 
-			// 2. INLINE HEADER UPDATE
-			// \033[u: restore cursor to log start
-			// \033[3F: move UP 3 lines (to catch the top of the bordered box)
-			// \033[K: clear line
-			// \033[u: restore cursor to log start for next scan
+			// INLINE HEADER/TIMER UPDATE
 			fmt.Printf("\033[u\033[3F\033[K%s\033[u", headerStyle.Render(headerText))
 
-			// 3. Scan and Compare
+			//scan and compare
 			newDevicesList, _ := list.GetSerialListDetailed()
 			newDevicesMap := buildPortMap(newDevicesList)
 			ts := dimStyle.Render(time.Now().Format("15:04:05") + " ")
-
+			//connections
 			for port := range newDevicesMap {
 				if _, found := oldDevicesMap[port]; !found {
 					msg := fmt.Sprintf("%s%s %s", ts, connectStyle.Render("CONNECTED"), portStyle.Render(port.Name))
@@ -114,7 +110,7 @@ func WatchSerialPorts(timeToWatch uint) error {
 					fmt.Print("\033[s") 
 				}
 			}
-
+			//disconnections
 			for port := range oldDevicesMap {
 				if _, found := newDevicesMap[port]; !found {
 					msg := fmt.Sprintf("%s%s %s", ts, disconnectStyle.Render("DISCONNECTED"), portStyle.Render(port.Name))
