@@ -15,7 +15,7 @@ jobs:
     strategy:
       matrix:
         include:
-          # macOS Native Builds (Requires CGO for IOKit)
+          # macOS Native Builds (Requires CGO for Apple's IOKit)
           - runner: macos-latest
             goos: darwin
             goarch: arm64
@@ -27,21 +27,17 @@ jobs:
             cgo: "1"
             ext: ""
             
-          # Linux AMD64 Native Build (Requires CGO for libudev)
+          # Linux & Windows Cross-Compile (Pure Go, NO CGO required!)
           - runner: ubuntu-latest
             goos: linux
             goarch: amd64
-            cgo: "1"
+            cgo: "0"
             ext: ""
-            
-          # Linux ARM64 Cross-Compile (Requires CGO + specific cross-compiler)
           - runner: ubuntu-latest
             goos: linux
             goarch: arm64
-            cgo: "1"
+            cgo: "0"
             ext: ""
-            
-          # Windows Cross-Compile (Does NOT require CGO, builds easily on Ubuntu)
           - runner: ubuntu-latest
             goos: windows
             goarch: amd64
@@ -57,29 +53,12 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Install Linux Dependencies (AMD64)
-        if: matrix.goos == 'linux' && matrix.goarch == 'amd64'
-        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config
-
-      - name: Install Linux Dependencies (ARM64 Cross-Compiler)
-        if: matrix.goos == 'linux' && matrix.goarch == 'arm64'
-        run: |
-          sudo dpkg --add-architecture arm64
-          # We use || true because 3rd party repos sometimes fail on multi-arch updates
-          sudo apt-get update || true
-          sudo apt-get install -y gcc-aarch64-linux-gnu libudev-dev:arm64 pkg-config
-
       - name: Build Binary
         env:
           CGO_ENABLED: ${{ matrix.cgo }}
           GOOS: ${{ matrix.goos }}
           GOARCH: ${{ matrix.goarch }}
         run: |
-          # If we are building for Linux ARM64, we must explicitly tell Go to use the ARM C-compiler
-          if [ "$GOOS" = "linux" ] && [ "$GOARCH" = "arm64" ]; then
-            export CC=aarch64-linux-gnu-gcc
-          fi
-          
           go build -o baud-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./cmd
 
       - name: Upload Artifact
