@@ -1,108 +1,96 @@
 # baud
 
-A lightweight, high-performance CLI tool for discovering serial ports. 
+A command-line utility for discovering and monitoring serial port connections.
 
 ## Features
-- **Fast Discovery:** Instantly list all connected serial devices.
-- **Hardware ID Mapping:** Uses an embedded USB database to identify device manufacturers (Arduino, ESP32, etc.).
-- **Smart Filtering:** Automatically hides system clutter (Bluetooth, debug ports) to keep your view clean.
-- **Zero Dependencies:** No need for `libusb` or `pkg-config`.
+
+* Lists physical USB serial devices.
+* Identifies device manufacturers and products using an embedded USB database.
+* Monitors for hardware connections and disconnections in real-time.
+* Ignores internal system ports, virtual ports, and Bluetooth connections by default.
+* Runs natively as a single binary without requiring `libusb` or external system libraries.
 
 ---
 
 ## Installation
 
-### For macOS (Apple Silicon & Intel)
-1. Download the latest binary from the [Releases](https://github.com/jakeswider/baud/releases) page.
-2. Open your terminal and run:
-   ```bash
-   # 1. Make the file executable
-   chmod +x ~/Downloads/baud-mac-arm64
+Download the latest compiled binaries for macOS, Linux, or Windows from the [Releases](https://github.com/jakeswider/baud/releases) page.
 
-   # 2. Bypass macOS security check
-   xattr -d com.apple.quarantine ~/Downloads/baud-mac-arm64
-
-   # 3. Move it to your system path
-   sudo mv ~/Downloads/baud-mac-arm64 /usr/local/bin/baud
-
-
-3. Type `baud list` to start!
-
-### For Windows
-
-1. Download `baud-windows.exe` from the [Releases](https://www.google.com/url?sa=E&source=gmail&q=https://github.com/jakeswider/baud/releases) page.
-2. Run it directly from your terminal:
-```powershell
-.\baud-windows.exe list
-
-```
-
-
-
-### For Developers (using Go)
-
-If you have Go installed, you can compile and install it directly:
+### macOS (Apple Silicon & Intel)
 
 ```bash
-go install github.com/jakeswider/baud/cmd@latest
+# 1. Make the downloaded file executable
+chmod +x ~/Downloads/baud-mac-arm64
 
+# 2. Bypass the macOS Gatekeeper security check
+xattr -d com.apple.quarantine ~/Downloads/baud-mac-arm64
+
+# 3. Move the binary to your system path
+sudo mv ~/Downloads/baud-mac-arm64 /usr/local/bin/baud
 ```
 
-*Note: Ensure your `$(go env GOPATH)/bin` is in your system `PATH`.*
+### Windows
+
+Extract the downloaded executable and run it directly from your terminal, or add it to your system's `PATH` variable for global access:
+
+```powershell
+.\baud-windows-amd64.exe list
+```
+
+### Go Developers
+
+If you have the Go toolchain installed, you can compile and install the utility directly:
+
+```bash
+go install [github.com/jakeswider/baud/cmd@latest](https://github.com/jakeswider/baud/cmd@latest)
+```
+*Note: Ensure `$(go env GOPATH)/bin` is included in your system `PATH`.*
 
 ---
 
 ## Usage
 
-### Basic List
+### list
 
-Show only physical USB hardware (filters out Bluetooth and virtual ports):
-
+List physical USB hardware connected to the machine:
 ```bash
 baud list
-
 ```
 
-### Identify Devices
-
-Show the manufacturer and product names (e.g., "Arduino Uno"):
-
+Include the manufacturer and product names in the output table:
 ```bash
 baud list --name
-
 ```
 
-### Show All
-
-Include internal system ports and Bluetooth:
-
+Override the default filter to display all internal system ports and virtual connections:
 ```bash
 baud list --showall
+```
 
+### watch
+
+Monitor the system for any serial devices being plugged in or unplugged. Set an optional timer in seconds using the `--time` or `-t` flag:
+```bash
+baud watch --time 30
 ```
 
 ---
 
 ## Development
 
-To build from source:
+To build the project from the source code:
 
-1. **Clone the repo:**
 ```bash
-git clone https://github.com/jakeswider/baud.git
+# Clone the repository
+git clone [https://github.com/jakeswider/baud.git](https://github.com/jakeswider/baud.git)
 
-```
-
-
-2. **Build:**
-```bash
+# Navigate to the directory and compile the binary
+cd baud
 go build -o baud ./cmd
-
 ```
-
-
 
 ---
 
 ## License
+
 Distributed under the MIT License.

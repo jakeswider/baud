@@ -22,7 +22,7 @@ func normID(s string) string {
 	return strings.ToLower(strings.TrimPrefix(s, "0x"))
 }
 
-func init() {
+func parseUSBDatabase() {
 	scanner := bufio.NewScanner(strings.NewReader(usbDB))
 
 	buf := make([]byte, 64*1024)
@@ -66,6 +66,10 @@ func init() {
 	}
 }
 
+func init() {
+	parseUSBDatabase()
+}
+
 type PortInfo struct {
 	Name         string
 	IsUSB        bool
@@ -91,15 +95,7 @@ func PortDetailstoPortInfo(pList []*enumerator.PortDetails) []PortInfo {
 }
 
 func GetSerialList() ([]string, error) {
-	ports, err := serial.GetPortsList()
-	if err != nil {
-		return []string{""}, err
-	}
-	if len(ports) == 0 {
-		return []string{"No ports found"}, nil
-	}
-
-	return ports, nil
+	return serial.GetPortsList()
 }
 
 func GetSerialListDetailed() ([]PortInfo, error) {
@@ -133,8 +129,8 @@ func IdentifyDevice(vid, pid string) string {
 	}
 
 	return vName + " " + pName
-
 }
+
 func usbPortList(portList []PortInfo) []PortInfo {
 	usbPorts := make([]PortInfo, 0)
 	for _, port := range portList {

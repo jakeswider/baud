@@ -10,8 +10,37 @@ permissions:
 
 jobs:
   build:
-    name: Build and Release
-    runs-on: ubuntu-latest
+    name: Build for ${{ matrix.os }} (${{ matrix.goarch }})
+    runs-on: ${{ matrix.runner }}
+    strategy:
+      matrix:
+        include:
+          - os: mac
+            runner: macos-latest
+            goos: darwin
+            goarch: arm64
+            ext: ""
+          - os: mac
+            runner: macos-latest
+            goos: darwin
+            goarch: amd64
+            ext: ""
+          - os: linux
+            runner: ubuntu-latest
+            goos: linux
+            goarch: amd64
+            ext: ""
+          - os: linux
+            runner: ubuntu-latest
+            goos: linux
+            goarch: arm64
+            ext: ""
+          - os: windows
+            runner: windows-latest
+            goos: windows
+            goarch: amd64
+            ext: ".exe"
+
     steps:
       - name: Checkout Code
         uses: actions/checkout@v4
@@ -21,16 +50,34 @@ jobs:
         with:
           go-version: '1.22'
 
-      - name: Build macOS Binaries
-        run: |
-          CGO_ENABLED=1 GOOS=darwin GOARCH=arm64 go build -o baud-mac-arm64 ./cmd
-          CGO_ENABLED=1 GOOS=darwin GOARCH=amd64 go build -o baud-mac-amd64 ./cmd
+      - name: Install Linux Dependencies
+        if: runner.os == 'Linux'
+        run: sudo apt-get update && sudo apt-get install -y libudev-dev pkg-config
 
-      - name: Create GitHub Release
+      - name: Build Binary
+        run: |
+          CGO_ENABLED=1 GOOS=${{ matrix.goos }} GOARCH=${{ matrix.goarch }} go build -o baud-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }} ./cmd
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: binary-${{ matrix.goos }}-${{ matrix.goarch }}
+          path: baud-${{ matrix.goos }}-${{ matrix.goarch }}${{ matrix.ext }}
+
+  release:
+    name: Create GitHub Release
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download all built artifacts
+        uses: actions/download-artifact@v4
+        with:
+          path: artifacts
+          merge-multiple: true
+
+      - name: Create Release
         uses: softprops/action-gh-release@v2
         with:
-          files: |
-            baud-mac-arm64
-            baud-mac-amd64
+          files: artifacts/*
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
